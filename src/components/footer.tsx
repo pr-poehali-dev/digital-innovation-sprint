@@ -6,9 +6,12 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           <div className="lg:col-span-1">
-            <h2 className="font-orbitron text-2xl font-bold text-white mb-4">
-              KONF<span className="text-blue-500">IT</span>
-            </h2>
+            <div className="flex items-center gap-3 mb-4">
+              <img src="https://cdn.poehali.dev/files/817be864-ddc0-4ff3-8d0e-54570a16b0d4.png" alt="KONFIT" className="h-10 w-auto" />
+              <h2 className="font-orbitron text-2xl font-bold text-white">
+                KONF<span className="text-blue-500">IT</span>
+              </h2>
+            </div>
             <p className="font-geist text-gray-300 mb-4 text-sm leading-relaxed">
               Комплексные поставки ИТ-оборудования и программного обеспечения для бизнеса любого масштаба
             </p>
