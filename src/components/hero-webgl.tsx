@@ -1,18 +1,11 @@
 import { Canvas, extend, useFrame } from "@react-three/fiber"
-import { useAspect, useTexture } from "@react-three/drei"
 import { useMemo, useRef, useState, useEffect } from "react"
 import * as THREE from "three"
 import { Button } from "@/components/ui/button"
 
-const TEXTUREMAP = { src: "https://cdn.poehali.dev/projects/d8a8138f-15bb-4762-a271-8a0e75c9e730/files/7eb1548f-9246-40c0-8c0d-2005989263a6.jpg" }
-
 extend(THREE as unknown as Record<string, unknown>)
 
-const WIDTH = 300
-const HEIGHT = 300
-
 const Scene = () => {
-  const rawMap = useTexture(TEXTUREMAP.src)
   const meshRef = useRef<THREE.Mesh>(null)
 
   const material = useMemo(() => {
@@ -25,82 +18,147 @@ const Scene = () => {
     `
 
     const fragmentShader = `
-      uniform sampler2D uTexture;
       uniform vec2 uPointer;
-      uniform float uProgress;
       uniform float uTime;
+      uniform vec2 uResolution;
       varying vec2 vUv;
 
-      float random(vec2 st) {
-        return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+      float hash(vec2 p) {
+        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
       }
 
-      float noise(vec2 st) {
-        vec2 i = floor(st);
-        vec2 f = fract(st);
-        float a = random(i);
-        float b = random(i + vec2(1.0, 0.0));
-        float c = random(i + vec2(0.0, 1.0));
-        float d = random(i + vec2(1.0, 1.0));
+      float noise(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
         vec2 u = f * f * (3.0 - 2.0 * f);
-        return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+        return mix(
+          mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
+          mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
+          u.y
+        );
+      }
+
+      float fbm(vec2 p) {
+        float v = 0.0;
+        float a = 0.5;
+        for (int i = 0; i < 5; i++) {
+          v += a * noise(p);
+          p *= 2.0;
+          a *= 0.5;
+        }
+        return v;
+      }
+
+      float hexGrid(vec2 uv, float scale) {
+        uv *= scale;
+        vec2 r = vec2(1.0, 1.732);
+        vec2 h = r * 0.5;
+        vec2 a = mod(uv, r) - h;
+        vec2 b = mod(uv - h, r) - h;
+        vec2 gv = length(a) < length(b) ? a : b;
+        float d = max(abs(gv.x), abs(gv.y * 0.577 + abs(gv.x) * 0.5));
+        return smoothstep(0.45, 0.4, d);
+      }
+
+      float shieldShape(vec2 uv) {
+        uv.y -= 0.05;
+        float top = smoothstep(0.35, 0.34, length(uv * vec2(1.0, 0.85)));
+        float bottom = smoothstep(0.0, 0.01, uv.y + 0.25 - abs(uv.x) * 0.8);
+        return top * bottom;
       }
 
       void main() {
         vec2 uv = vUv;
+        vec2 centeredUv = (uv - 0.5) * 2.0;
+        centeredUv += uPointer * 0.05;
 
-        float luma = dot(texture2D(uTexture, uv).rgb, vec3(0.299, 0.587, 0.114));
-        vec2 displacement = luma * uPointer * 0.015;
-        vec2 distortedUv = uv + displacement;
+        vec3 bgColor = vec3(0.02, 0.04, 0.08);
 
-        vec4 baseColor = texture2D(uTexture, distortedUv);
+        float grid = hexGrid(uv + uPointer * 0.02, 12.0);
+        float gridPulse = sin(uTime * 0.5 + uv.y * 6.0) * 0.5 + 0.5;
+        vec3 gridColor = vec3(0.05, 0.15, 0.4) * grid * gridPulse * 0.3;
 
-        float aspect = ${WIDTH}.0 / ${HEIGHT}.0;
-        vec2 tUv = vec2(uv.x * aspect, uv.y);
-        vec2 tiling = vec2(100.0);
-        vec2 tiledUv = mod(tUv * tiling, 2.0) - 1.0;
+        float n = fbm(uv * 3.0 + uTime * 0.1);
+        float n2 = fbm(uv * 5.0 - uTime * 0.15 + 100.0);
+        vec3 cloudColor = vec3(0.0, 0.1, 0.3) * n * 0.4 + vec3(0.0, 0.05, 0.2) * n2 * 0.3;
 
-        float brightness = noise(tUv * tiling * 0.5);
-        float dist = length(tiledUv);
-        float dotVal = smoothstep(0.5, 0.49, dist) * brightness;
+        float shield = shieldShape(centeredUv);
+        float shieldEdge = shieldShape(centeredUv) - shieldShape(centeredUv * 1.08);
+        float shieldPulse = sin(uTime * 1.5) * 0.3 + 0.7;
+        vec3 shieldColor = vec3(0.1, 0.4, 1.0) * shieldEdge * 2.0 * shieldPulse;
+        shieldColor += vec3(0.05, 0.15, 0.5) * shield * 0.15;
 
-        float scanLine = sin(uv.y * 800.0 + uTime * 2.0) * 0.02;
+        float lockBody = smoothstep(0.08, 0.07, max(abs(centeredUv.x) - 0.06, abs(centeredUv.y + 0.02) - 0.05));
+        float lockArc = smoothstep(0.06, 0.05, abs(length(vec2(centeredUv.x, max(centeredUv.y - 0.03, 0.0))) - 0.05));
+        lockArc *= step(0.03, centeredUv.y);
+        float lock = max(lockBody, lockArc) * shield;
+        vec3 lockColor = vec3(0.2, 0.6, 1.0) * lock * shieldPulse;
 
-        float flow = 1.0 - smoothstep(0.0, 0.03, abs(luma - uProgress));
+        float ring1 = abs(length(centeredUv) - 0.55 - sin(uTime * 0.3) * 0.02);
+        ring1 = smoothstep(0.008, 0.0, ring1);
+        float ring2 = abs(length(centeredUv) - 0.65 - cos(uTime * 0.4) * 0.02);
+        ring2 = smoothstep(0.004, 0.0, ring2);
 
-        vec3 mask = vec3(0.0, dotVal * flow * 5.0, dotVal * flow * 12.0);
+        float angle = atan(centeredUv.y, centeredUv.x);
+        float ringDash1 = step(0.0, sin(angle * 20.0 + uTime * 2.0));
+        float ringDash2 = step(0.0, sin(angle * 30.0 - uTime * 1.5));
 
-        vec3 final = baseColor.rgb + mask + scanLine;
+        vec3 ringColor = vec3(0.1, 0.3, 0.8) * ring1 * ringDash1 + vec3(0.05, 0.2, 0.6) * ring2 * ringDash2;
 
-        gl_FragColor = vec4(final, 1.0);
+        for (float i = 0.0; i < 6.0; i++) {
+          float a = i * 1.0472 + uTime * 0.2;
+          vec2 dir = vec2(cos(a), sin(a));
+          float line = abs(dot(centeredUv, vec2(-dir.y, dir.x)));
+          float mask = smoothstep(0.55, 0.7, length(centeredUv));
+          line = smoothstep(0.003, 0.0, line) * mask * smoothstep(1.0, 0.55, length(centeredUv));
+          ringColor += vec3(0.05, 0.15, 0.4) * line * 0.5;
+        }
+
+        float scanLine = sin(uv.y * 400.0 + uTime * 3.0) * 0.015;
+
+        float particleField = 0.0;
+        for (float i = 0.0; i < 15.0; i++) {
+          vec2 pos = vec2(
+            hash(vec2(i, 0.0)) * 2.0 - 1.0,
+            hash(vec2(0.0, i)) * 2.0 - 1.0
+          );
+          pos += vec2(sin(uTime * 0.5 + i), cos(uTime * 0.3 + i * 1.5)) * 0.3;
+          float d = length(centeredUv - pos);
+          particleField += smoothstep(0.02, 0.0, d) * 0.5;
+        }
+        vec3 particleColor = vec3(0.2, 0.5, 1.0) * particleField;
+
+        float vignette = 1.0 - length(centeredUv) * 0.5;
+        vignette = clamp(vignette, 0.0, 1.0);
+
+        vec3 color = bgColor + gridColor + cloudColor + shieldColor + lockColor + ringColor + particleColor + scanLine;
+        color *= vignette;
+        color = clamp(color, 0.0, 1.0);
+
+        gl_FragColor = vec4(color, 1.0);
       }
     `
 
     return new THREE.ShaderMaterial({
       uniforms: {
-        uTexture: { value: rawMap },
         uPointer: { value: new THREE.Vector2(0, 0) },
-        uProgress: { value: 0 },
         uTime: { value: 0 },
+        uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
       },
       vertexShader,
       fragmentShader,
     })
-  }, [rawMap])
-
-  const [w, h] = useAspect(WIDTH, HEIGHT)
+  }, [])
 
   useFrame(({ clock, pointer }) => {
     if (material.uniforms) {
-      material.uniforms.uProgress.value = Math.sin(clock.getElapsedTime() * 0.4) * 0.5 + 0.5
-      material.uniforms.uPointer.value = pointer
+      material.uniforms.uPointer.value.lerp(pointer, 0.05)
       material.uniforms.uTime.value = clock.getElapsedTime()
     }
   })
 
-  const scaleFactor = 0.3
   return (
-    <mesh ref={meshRef} scale={[w * scaleFactor, h * scaleFactor, 1]} material={material}>
+    <mesh ref={meshRef} scale={[3, 3, 1]} material={material}>
       <planeGeometry />
     </mesh>
   )
