@@ -7,7 +7,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           <div className="lg:col-span-1">
             <div className="mb-4">
-              <img src="https://cdn.poehali.dev/files/817be864-ddc0-4ff3-8d0e-54570a16b0d4.png" alt="KONFIT" className="h-14 w-auto" />
+              <img src="https://cdn.poehali.dev/files/817be864-ddc0-4ff3-8d0e-54570a16b0d4.png" alt="KONFIT" className="h-[67px] w-auto" />
             </div>
             <p className="font-geist text-gray-300 mb-4 text-sm leading-relaxed">
               Комплексные поставки ИТ-оборудования и программного обеспечения для бизнеса любого масштаба
@@ -80,9 +80,9 @@ export function Footer() {
             <h3 className="font-orbitron text-white font-semibold mb-4">Реквизиты</h3>
             <ul className="space-y-2 font-geist text-gray-400 text-sm">
               <li>ООО «КОНФИТ»</li>
-              <li>ИНН: 7700000000</li>
-              <li>ОГРН: 1177700000000</li>
-              <li>КПП: 770001001</li>
+              <li>ИНН: 5260501463</li>
+              <li>КПП: 526001001</li>
+              <li>ОГРН: 1255200019865</li>
             </ul>
           </div>
         </div>
