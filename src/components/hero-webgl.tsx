@@ -2,6 +2,7 @@ import { Canvas, extend, useFrame } from "@react-three/fiber"
 import { useAspect, useTexture } from "@react-three/drei"
 import { useMemo, useRef, useState, useEffect } from "react"
 import * as THREE from "three"
+import { Button } from "@/components/ui/button"
 
 const TEXTUREMAP = { src: "https://i.postimg.cc/XYwvXN8D/img-4.png" }
 const DEPTHMAP = { src: "https://i.postimg.cc/2SHKQh2q/raw-4.webp" }
@@ -32,7 +33,6 @@ const Scene = () => {
       uniform float uTime;
       varying vec2 vUv;
 
-      // Simple noise function
       float random(vec2 st) {
         return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
       }
@@ -50,16 +50,11 @@ const Scene = () => {
 
       void main() {
         vec2 uv = vUv;
-
-        // Depth-based displacement
         float depth = texture2D(uDepthMap, uv).r;
         vec2 displacement = depth * uPointer * 0.01;
         vec2 distortedUv = uv + displacement;
-
-        // Base texture
         vec4 baseColor = texture2D(uTexture, distortedUv);
 
-        // Create scanning effect
         float aspect = ${WIDTH}.0 / ${HEIGHT}.0;
         vec2 tUv = vec2(uv.x * aspect, uv.y);
         vec2 tiling = vec2(120.0);
@@ -69,14 +64,12 @@ const Scene = () => {
         float dist = length(tiledUv);
         float dot = smoothstep(0.5, 0.49, dist) * brightness;
 
-        // Flow effect based on progress
         float flow = 1.0 - smoothstep(0.0, 0.02, abs(depth - uProgress));
 
-        // Red scanning overlay
-        vec3 mask = vec3(dot * flow * 10.0, 0.0, 0.0);
+        vec3 mask = vec3(0.0, dot * flow * 4.0, dot * flow * 10.0);
 
-        // Combine effects
-        vec3 final = baseColor.rgb + mask;
+        vec3 tinted = baseColor.rgb * vec3(0.7, 0.85, 1.0);
+        vec3 final = tinted + mask;
 
         gl_FragColor = vec4(final, 1.0);
       }
@@ -114,12 +107,13 @@ const Scene = () => {
 }
 
 export const Hero3DWebGL = () => {
-  const titleWords = "Synapse AI".split(" ")
-  const subtitle = "Нейроинтерфейсы нового поколения."
+  const titleWords = ["KONFIT"]
+  const subtitle = "Комплексные ИТ-решения для вашего бизнеса"
   const [visibleWords, setVisibleWords] = useState(0)
   const [subtitleVisible, setSubtitleVisible] = useState(false)
   const [delays, setDelays] = useState<number[]>([])
   const [subtitleDelay, setSubtitleDelay] = useState(0)
+  const [buttonsVisible, setButtonsVisible] = useState(false)
 
   useEffect(() => {
     setDelays(titleWords.map(() => Math.random() * 0.07))
@@ -136,13 +130,20 @@ export const Hero3DWebGL = () => {
     }
   }, [visibleWords, titleWords.length])
 
+  useEffect(() => {
+    if (subtitleVisible) {
+      const timeout = setTimeout(() => setButtonsVisible(true), 1000)
+      return () => clearTimeout(timeout)
+    }
+  }, [subtitleVisible])
+
   return (
-    <div className="h-screen bg-black relative overflow-hidden">
+    <div className="h-screen bg-[hsl(220,25%,5%)] relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none z-10">
-        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent" />
-        <div className="absolute top-0 bottom-0 left-0 w-32 bg-gradient-to-r from-black to-transparent" />
-        <div className="absolute top-0 bottom-0 right-0 w-32 bg-gradient-to-l from-black to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[hsl(220,25%,5%)] to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[hsl(220,25%,5%)] to-transparent" />
+        <div className="absolute top-0 bottom-0 left-0 w-32 bg-gradient-to-r from-[hsl(220,25%,5%)] to-transparent" />
+        <div className="absolute top-0 bottom-0 right-0 w-32 bg-gradient-to-l from-[hsl(220,25%,5%)] to-transparent" />
       </div>
 
       <div className="h-screen uppercase items-center w-full absolute z-[60] pointer-events-none px-10 flex justify-center flex-col">
@@ -162,7 +163,7 @@ export const Hero3DWebGL = () => {
             ))}
           </div>
         </div>
-        <div className="text-xs md:text-xl xl:text-2xl 2xl:text-3xl mt-2 overflow-hidden text-white font-bold max-w-4xl mx-auto text-center px-4">
+        <div className="text-xs md:text-xl xl:text-2xl 2xl:text-3xl mt-2 overflow-hidden text-white font-bold max-w-4xl mx-auto text-center px-4 normal-case">
           <div
             className={subtitleVisible ? "fade-in-subtitle" : ""}
             style={{
@@ -173,6 +174,36 @@ export const Hero3DWebGL = () => {
             {subtitle}
           </div>
         </div>
+        <div className="mt-4 md:mt-6 text-sm md:text-base text-blue-200/80 max-w-2xl text-center normal-case">
+          <div
+            className={subtitleVisible ? "fade-in-subtitle" : ""}
+            style={{
+              animationDelay: `${titleWords.length * 0.13 + 0.5 + subtitleDelay}s`,
+              opacity: subtitleVisible ? undefined : 0,
+            }}
+          >
+            Программное обеспечение · Серверное оборудование · Информационная безопасность · Сетевая инфраструктура
+          </div>
+        </div>
+        {buttonsVisible && (
+          <div className="mt-8 flex gap-4 pointer-events-auto fade-in" style={{ animationDelay: "0.2s" }}>
+            <Button
+              size="lg"
+              className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8"
+              onClick={() => document.getElementById('contacts')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              Оставить заявку
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-blue-500 text-blue-400 hover:bg-blue-600 hover:text-white text-lg px-8 bg-transparent"
+              onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              Каталог
+            </Button>
+          </div>
+        )}
       </div>
 
       <Canvas
@@ -183,7 +214,7 @@ export const Hero3DWebGL = () => {
           powerPreference: "high-performance",
         }}
         camera={{ position: [0, 0, 1] }}
-        style={{ background: "#000000" }}
+        style={{ background: "hsl(220, 25%, 5%)" }}
       >
         <Scene />
       </Canvas>

@@ -1,53 +1,54 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import Icon from "@/components/ui/icon"
 
 const features = [
   {
-    title: "Адаптивная нейрообработка",
-    description: "Самооптимизирующиеся алгоритмы, которые обучаются на нейронных паттернах и улучшают интерпретацию сигналов.",
-    icon: "brain",
-    badge: "ИИ",
+    title: "Полный цикл поставок",
+    description: "Закрываем 100% потребностей в ИТ-продуктах: от рабочих станций и оргтехники до серверного оборудования и систем безопасности.",
+    icon: "Package",
+    badge: "Всё в одном",
   },
   {
-    title: "Медицинская защита",
-    description: "Шифрование по стандартам FDA со сквозной защитой конфиденциальных нейронных данных.",
-    icon: "lock",
-    badge: "Сертификат",
+    title: "Официальные поставки",
+    description: "Работаем напрямую с производителями и авторизованными дистрибьюторами. Гарантия подлинности каждого продукта.",
+    icon: "ShieldCheck",
+    badge: "Гарантия",
   },
   {
-    title: "Интуитивное управление",
-    description: "Естественная трансляция мыслей в действия с откликом менее миллисекунды и точностью 99,7%.",
-    icon: "globe",
-    badge: "Точность",
+    title: "Экспертная команда",
+    description: "Сертифицированные инженеры подберут оптимальное решение под ваши задачи и бюджет с учётом специфики бизнеса.",
+    icon: "Users",
+    badge: "Эксперты",
   },
   {
-    title: "Предиктивная калибровка",
-    description: "ML-модели, которые предугадывают намерения пользователя и оптимизируют нейронные пути.",
-    icon: "zap",
-    badge: "Умный",
+    title: "Быстрая доставка",
+    description: "Складской запас ходовых позиций и отлаженная логистика позволяют обеспечить поставку в кратчайшие сроки по всей России.",
+    icon: "Truck",
+    badge: "Скорость",
   },
   {
-    title: "Биометрическая интеграция",
-    description: "Бесшовная синхронизация с мониторингом жизненных показателей для контроля здоровья.",
-    icon: "link",
-    badge: "Связь",
+    title: "Техническая поддержка",
+    description: "Помогаем с внедрением, настройкой и сопровождением. Техподдержка на всех этапах — от закупки до эксплуатации.",
+    icon: "Headphones",
+    badge: "Поддержка",
   },
   {
-    title: "Поддержка XR",
-    description: "Нативная совместимость с AR/VR-средами для терапевтических и рабочих приложений.",
-    icon: "target",
-    badge: "XR Ready",
+    title: "Гибкие условия",
+    description: "Индивидуальные коммерческие условия, работа по 44-ФЗ и 223-ФЗ, возможность отсрочки платежа для постоянных клиентов.",
+    icon: "Handshake",
+    badge: "B2B",
   },
 ]
 
 export function FeaturesSection() {
   return (
-    <section className="py-24 px-6 bg-background">
+    <section id="advantages" className="py-24 px-6 bg-background">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-foreground mb-4 font-sans">Возможности нового поколения</h2>
+          <h2 className="text-4xl font-bold text-foreground mb-4 font-sans">Почему выбирают KONFIT</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Почувствуйте будущее с технологиями, которые переопределяют возможное
+            Надёжный ИТ-партнёр, который закрывает все потребности вашего бизнеса в технологиях
           </p>
         </div>
 
@@ -60,15 +61,10 @@ export function FeaturesSection() {
             >
               <CardHeader>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-3xl">
-                    {feature.icon === "brain" && "&#129504;"}
-                    {feature.icon === "lock" && "&#128274;"}
-                    {feature.icon === "globe" && "&#127760;"}
-                    {feature.icon === "zap" && "&#9889;"}
-                    {feature.icon === "link" && "&#128279;"}
-                    {feature.icon === "target" && "&#127919;"}
-                  </span>
-                  <Badge variant="secondary" className="bg-accent text-accent-foreground">
+                  <div className="w-12 h-12 rounded-lg bg-blue-600/10 flex items-center justify-center">
+                    <Icon name={feature.icon} size={24} className="text-blue-500" />
+                  </div>
+                  <Badge variant="secondary" className="bg-accent/10 text-blue-400 border border-blue-500/30">
                     {feature.badge}
                   </Badge>
                 </div>
@@ -86,3 +82,5 @@ export function FeaturesSection() {
     </section>
   )
 }
+
+export default FeaturesSection
