@@ -22,20 +22,26 @@ export function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center gap-3">
                 <Icon name="Phone" size={16} className="text-blue-400 flex-shrink-0" />
-                <a href="tel:+74951234567" className="font-geist text-gray-300 hover:text-blue-400 transition-colors text-sm">
-                  +7 (495) 123-45-67
+                <a href="tel:+79036000073" className="font-geist text-gray-300 hover:text-blue-400 transition-colors text-sm">
+                  +7 (903) 600-00-73
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Icon name="Mail" size={16} className="text-blue-400 flex-shrink-0" />
-                <a href="mailto:info@konfit.ru" className="font-geist text-gray-300 hover:text-blue-400 transition-colors text-sm">
-                  info@konfit.ru
+                <a href="mailto:info@konf-it.ru" className="font-geist text-gray-300 hover:text-blue-400 transition-colors text-sm">
+                  info@konf-it.ru
+                </a>
+              </li>
+              <li className="flex items-center gap-3">
+                <Icon name="Mail" size={16} className="text-blue-400 flex-shrink-0" />
+                <a href="mailto:office@konf-it.ru" className="font-geist text-gray-300 hover:text-blue-400 transition-colors text-sm">
+                  office@konf-it.ru
                 </a>
               </li>
               <li className="flex items-start gap-3">
                 <Icon name="MapPin" size={16} className="text-blue-400 flex-shrink-0 mt-0.5" />
                 <span className="font-geist text-gray-300 text-sm">
-                  г. Москва, ул. Примерная, д. 1, офис 100
+                  г. Нижний Новгород, ул. Варварская 27/8
                 </span>
               </li>
               <li className="flex items-center gap-3">
