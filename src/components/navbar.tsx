@@ -9,11 +9,8 @@ export function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-[9999] bg-[hsl(220,25%,5%)]/95 backdrop-blur-md border-b border-blue-500/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div className="flex-shrink-0 flex items-center gap-2">
-            <img src="https://cdn.poehali.dev/files/817be864-ddc0-4ff3-8d0e-54570a16b0d4.png" alt="KONFIT" className="h-9 w-auto" />
-            <h1 className="font-orbitron text-xl font-bold text-white tracking-wider">
-              KONF<span className="text-blue-500">IT</span>
-            </h1>
+          <div className="flex-shrink-0">
+            <img src="https://cdn.poehali.dev/files/817be864-ddc0-4ff3-8d0e-54570a16b0d4.png" alt="KONFIT" className="h-12 w-auto" />
           </div>
 
           <div className="hidden md:block">
